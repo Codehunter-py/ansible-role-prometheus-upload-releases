@@ -1,0 +1,61 @@
+#SPDX-License-Identifier: MIT-0
+---
+# defaults file for ansible-role-prometheus-upload-releases
+# Component list (expand as needed)
+
+component_sources:
+  alertmanager: prometheus/alertmanager
+  apache_exporter: Lusitaniae/apache_exporter
+  node_exporter: prometheus/node_exporter
+  prometheus: prometheus/prometheus
+  pushgateway: prometheus/pushgateway
+  blackbox_exporter: prometheus/blackbox_exporter
+  mysqld_exporter: prometheus/mysqld_exporter
+  snmp_exporter: prometheus/snmp_exporter
+  memcached_exporter: prometheus/memcached_exporter
+  graphite_exporter: prometheus/graphite_exporter
+  statsd_exporter: prometheus/statsd_exporter
+  systemd_exporter: prometheus-community/systemd_exporter
+  windows_exporter: prometheus-community/windows_exporter
+  postgres_exporter: prometheus-community/postgres_exporter
+
+prometheus_components:
+  - alertmanager
+  - apache_exporter
+  - node_exporter
+  - prometheus
+  - pushgateway
+  - blackbox_exporter
+  - mysqld_exporter
+  - snmp_exporter
+  - statsd_exporter
+  - memcached_exporter
+  - graphite_exporter
+  - systemd_exporter
+  - windows_exporter
+  - postgres_exporter
+
+# Version per component (example: map versions as needed)
+prometheus_versions:
+  alertmanager: "0.28.1"
+  apache_exporter: "1.0.10"
+  node_exporter: "1.9.1"
+  prometheus: "2.53.5"
+  pushgateway: "1.11.1"
+  blackbox_exporter: "0.27.0"
+  mysqld_exporter: "0.17.2"
+  snmp_exporter: "0.29.0"
+  memcached_exporter: "0.15.3"
+  systemd_exporter: "0.7.0"
+  windows_exporter: "0.25.1"
+  graphite_exporter: "0.16.0"
+  postgres_exporter: "0.17.1"
+  statsd_exporter: "0.28.0"
+
+# Base URLs
+nexus_base_url: "http://localhost:8081/repository/prometheus"
+nexus_user: "admin"
+nexus_password: "passwd"
+
+# Local temp dir
+download_dir: "/tmp/prometheus_artifacts"

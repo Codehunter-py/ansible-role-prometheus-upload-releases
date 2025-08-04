@@ -1,0 +1,16 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for ansible-role-prometheus-upload-releases
+- name: Ensure download directory exists
+  file:
+    path: "{{ download_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Process each Prometheus component
+  include_tasks: per_component.yml
+  loop: "{{ prometheus_components }}"
+  loop_control:
+    loop_var: component
+  vars:
+    component_version: "{{ prometheus_versions[component] }}"

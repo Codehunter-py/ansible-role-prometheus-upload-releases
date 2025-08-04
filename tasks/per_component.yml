@@ -1,0 +1,57 @@
+---
+- name: Set GitHub repo path
+  set_fact:
+    repo_path: "{{ component_sources[component] }}"
+
+- name: Set artifact suffix
+  set_fact:
+    artifact_suffix: >-
+      {{ '-amd64.exe' if component == 'windows_exporter' else '.linux-amd64.tar.gz' }}
+
+- name: Set tarball and checksum filenames
+  set_fact:
+    tarball_name: "{{ component }}-{{ component_version }}{{ artifact_suffix }}"
+    checksum_name: "sha256sums.txt"
+
+- name: Set GitHub base release URL
+  set_fact:
+    component_url: "https://github.com/{{ repo_path }}/releases/download/v{{ component_version }}"
+
+- name: Set download URLs
+  set_fact:
+    tarball_url: "{{ component_url }}/{{ tarball_name }}"
+    checksum_url: "{{ component_url }}/{{ checksum_name }}"
+
+- name: Download tarball
+  get_url:
+    url: "{{ tarball_url }}"
+    dest: "{{ download_dir }}/{{ tarball_name }}"
+    mode: '0644'
+    force: yes
+    validate_certs: false
+
+- name: Download checksum
+  get_url:
+    url: "{{ checksum_url }}"
+    dest: "{{ download_dir }}/{{ component }}-{{ checksum_name }}"
+    mode: '0644'
+    force: yes
+    validate_certs: false
+
+- name: Upload tarball to Nexus using curl
+  ansible.builtin.shell: >
+    curl -sS -u {{ nexus_user }}:{{ nexus_password }}
+    --upload-file "{{ download_dir }}/{{ tarball_name }}"
+    "{{ nexus_base_url }}/{{ component }}/{{ component_version }}/{{ tarball_name }}"
+  register: upload_tarball
+  failed_when: upload_tarball.rc != 0
+  changed_when: true
+
+- name: Upload checksum to Nexus using curl
+  ansible.builtin.shell: >
+    curl -sS -u {{ nexus_user }}:{{ nexus_password }}
+    --upload-file "{{ download_dir }}/{{ component }}-{{ checksum_name }}"
+    "{{ nexus_base_url }}/{{ component }}/{{ component_version }}/{{ checksum_name }}"
+  register: upload_checksum
+  failed_when: upload_checksum.rc != 0
+  changed_when: true
