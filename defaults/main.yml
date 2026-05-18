@@ -22,6 +22,7 @@ component_sources:
   keepalived_exporter: mehdy/keepalived-exporter
 
 prometheus_components:
+  - keepalived-exporter
   - alloy
   - alertmanager
   - apache_exporter
@@ -37,10 +38,10 @@ prometheus_components:
   - systemd_exporter
   - windows_exporter
   - postgres_exporter
-  - keepalived_exporter
 
 # Version per component (example: map versions as needed)
 prometheus_versions:
+  keepalived-exporter: "1.7.1"
   alertmanager: "0.32.1"
   alloy: "1.16.1"
   apache_exporter: "1.0.10"
@@ -56,7 +57,6 @@ prometheus_versions:
   graphite_exporter: "0.16.0"
   postgres_exporter: "0.17.1"
   statsd_exporter: "0.28.0"
-  keepalived_exporter: "1.7.1"
 
 # Base URLs
 nexus_base_url: "http://localhost:8081/repository/prometheus"

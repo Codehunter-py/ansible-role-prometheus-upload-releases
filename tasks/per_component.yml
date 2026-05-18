@@ -1,17 +1,35 @@
 ---
+- name: Normalize component name (dash → underscore)
+  set_fact:
+    component_key: "{{ component | replace('-', '_') }}"
+
 - name: Set GitHub repo path
   set_fact:
-    repo_path: "{{ component_sources[component] }}"
+    repo_path: "{{ component_sources[component_key] }}"
 
 - name: Set artifact suffix
   set_fact:
-    artifact_suffix: >-
-      {{ '-amd64.exe' if component == 'windows_exporter' else '.linux-amd64.tar.gz' }}
+    artifact_suffix: "{{ suffix_map[component_key] | default('.linux-amd64.tar.gz') }}"
+  vars:
+    suffix_map:
+      windows_exporter: "-amd64.exe"
+      alloy: "-1.amd64.rpm"
+      keepalived_exporter: "_linux_amd64.rpm"
 
 - name: Set tarball and checksum filenames
   set_fact:
-    tarball_name: "{{ component }}-{{ component_version }}{{ artifact_suffix }}"
-    checksum_name: "sha256sums.txt"
+    tarball_name: >-
+      {{
+        tarball_map[component_key]
+        | default(component_key ~ '-' ~ component_version ~ artifact_suffix)
+      }}
+    checksum_name: "{{ checksum_map[component_key] | default('sha256sums.txt') }}"
+  vars:
+    checksum_map:
+      alloy: "SHA256SUMS"
+      keepalived_exporter: "checksums.txt"
+    tarball_map:
+      keepalived_exporter: "keepalived-exporter_{{ component_version }}_linux_amd64.rpm"
 
 - name: Set GitHub base release URL
   set_fact:
@@ -33,7 +51,7 @@
 - name: Download checksum
   get_url:
     url: "{{ checksum_url }}"
-    dest: "{{ download_dir }}/{{ component }}-{{ checksum_name }}"
+    dest: "{{ download_dir }}/{{ component_key }}-{{ checksum_name }}"
     mode: '0644'
     force: yes
     validate_certs: false
@@ -42,7 +60,7 @@
   ansible.builtin.shell: >
     curl -sS -u {{ nexus_user }}:{{ nexus_password }}
     --upload-file "{{ download_dir }}/{{ tarball_name }}"
-    "{{ nexus_base_url }}/{{ component }}/{{ component_version }}/{{ tarball_name }}"
+    "{{ nexus_base_url }}/{{ component_key }}/{{ component_version }}/{{ tarball_name }}"
   register: upload_tarball
   failed_when: upload_tarball.rc != 0
   changed_when: true
@@ -50,8 +68,8 @@
 - name: Upload checksum to Nexus using curl
   ansible.builtin.shell: >
     curl -sS -u {{ nexus_user }}:{{ nexus_password }}
-    --upload-file "{{ download_dir }}/{{ component }}-{{ checksum_name }}"
-    "{{ nexus_base_url }}/{{ component }}/{{ component_version }}/{{ checksum_name }}"
+    --upload-file "{{ download_dir }}/{{ component_key }}-{{ checksum_name }}"
+    "{{ nexus_base_url }}/{{ component_key }}/{{ component_version }}/{{ checksum_name }}"
   register: upload_checksum
   failed_when: upload_checksum.rc != 0
   changed_when: true
