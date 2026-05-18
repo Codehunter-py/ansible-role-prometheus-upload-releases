@@ -4,6 +4,7 @@
 # Component list (expand as needed)
 
 component_sources:
+  alloy: grafana/alloy
   alertmanager: prometheus/alertmanager
   apache_exporter: Lusitaniae/apache_exporter
   node_exporter: prometheus/node_exporter
@@ -18,8 +19,11 @@ component_sources:
   systemd_exporter: prometheus-community/systemd_exporter
   windows_exporter: prometheus-community/windows_exporter
   postgres_exporter: prometheus-community/postgres_exporter
+  keepalived_exporter: mehdy/keepalived-exporter
 
 prometheus_components:
+  - keepalived-exporter
+  - alloy
   - alertmanager
   - apache_exporter
   - node_exporter
@@ -37,12 +41,14 @@ prometheus_components:
 
 # Version per component (example: map versions as needed)
 prometheus_versions:
-  alertmanager: "0.28.1"
+  keepalived-exporter: "1.7.1"
+  alertmanager: "0.32.1"
+  alloy: "1.16.1"
   apache_exporter: "1.0.10"
-  node_exporter: "1.9.1"
-  prometheus: "2.53.5"
+  node_exporter: "1.10.2"
+  prometheus: "3.11.3"
   pushgateway: "1.11.1"
-  blackbox_exporter: "0.27.0"
+  blackbox_exporter: "0.28.0"
   mysqld_exporter: "0.17.2"
   snmp_exporter: "0.29.0"
   memcached_exporter: "0.15.3"
